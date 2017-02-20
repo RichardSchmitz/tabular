@@ -26,17 +26,17 @@ public class TablePopulator {
     this.parser = Parser.builder().extensions(Arrays.asList(TablesExtension.create())).build();
   }
 
-  public void populateTable(String tableName, InputStream markdown) throws SQLException, IOException {
-    populateTable(tableName, IOUtils.toString(markdown));
+  public void populateTable(String schema, String tableName, InputStream markdown) throws SQLException, IOException {
+    populateTable(schema, tableName, IOUtils.toString(markdown));
   }
 
-  public void populateTable(String tableName, String markdown) throws SQLException {
+  public void populateTable(String schema, String tableName, String markdown) throws SQLException {
     Node document = parser.parse(markdown);
 
     try(Connection con = dataSource.getConnection()) {
       DatabaseMetaData metaData = con.getMetaData();
-      TableDefinition tableDefinition = new TableDefinition(tableName);
-      ResultSet rs = metaData.getColumns(null, null, tableName.toUpperCase(), null);
+      TableDefinition tableDefinition = new TableDefinition(schema, tableName);
+      ResultSet rs = metaData.getColumns(null, schema.toUpperCase(), tableName.toUpperCase(), null);
       int numColumns = 0;
       Map<String, Integer> columnType = new HashMap<>();
       while (rs.next()) {

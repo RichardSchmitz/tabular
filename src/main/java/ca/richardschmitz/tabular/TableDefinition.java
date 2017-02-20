@@ -4,11 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TableDefinition {
+  private final String schema;
   private final String name;
   private final List<ColumnDefinition> columns = new ArrayList<>();
 
-  public TableDefinition(String name) {
+  public TableDefinition(String schema, String name) {
+    this.schema = schema;
     this.name = name;
+  }
+
+  public String getFullyQualifiedName() {
+    if (schema == null) {
+      return getName();
+    } else {
+      return getSchema() + "." + getName();
+    }
+  }
+
+  public String getSchema() {
+    return schema;
   }
 
   public String getName() {

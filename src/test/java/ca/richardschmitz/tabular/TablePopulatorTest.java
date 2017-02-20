@@ -22,10 +22,11 @@ public class TablePopulatorTest {
     TablePopulator tablePopulator = new TablePopulator(dataSource);
 
     try (Handle handle = dbi.open()) {
-      handle.execute("CREATE TABLE people (first_name VARCHAR, last_name VARCHAR, age INT, occupation VARCHAR)");
-      tablePopulator.populateTable("people", inputStream);
+      handle.execute("CREATE SCHEMA myschema");
+      handle.execute("CREATE TABLE myschema.people (first_name VARCHAR, last_name VARCHAR, age INT, occupation VARCHAR)");
+      tablePopulator.populateTable("myschema", "people", inputStream);
 
-      List<Map<String, Object>> rows = handle.createQuery("select * from people order by last_name").list();
+      List<Map<String, Object>> rows = handle.createQuery("select * from myschema.people order by last_name").list();
       assertThat(rows).size().isEqualTo(2);
 
       Map<String, Object> firstRow = rows.get(0);

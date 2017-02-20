@@ -15,7 +15,7 @@ public class TableLoader {
   }
 
   public void loadRow(Connection con, Map<Integer, String> row) throws SQLException {
-    PreparedStatement preparedStatement = con.prepareStatement("insert into " + tableDefinition.getName() + "(" + getColumnNames() +") VALUES (" + getParameterPlaceholders() + ")");
+    PreparedStatement preparedStatement = con.prepareStatement("insert into " + tableDefinition.getFullyQualifiedName() + "(" + getColumnNames() +") VALUES (" + getParameterPlaceholders() + ")");
     row.forEach((index, value) -> {
       int sqlIndex = index + 1;
       try {
