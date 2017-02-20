@@ -45,7 +45,12 @@ public class TablePopulator {
         Map<Integer, String> columnValues = new HashMap<>();
         for (int i = 0; i < tableDefinition.getColumns().size(); i++) {
           Node cell = getNthChild(row, i);
-          columnValues.put(i, ((Text) cell.getFirstChild()).getLiteral());
+          String value = "";
+          Text textNode = (Text) cell.getFirstChild();
+          if (textNode != null) {
+            value = textNode.getLiteral();
+          }
+          columnValues.put(i, value);
         }
         tableLoader.loadRow(con, columnValues);
         row = row.getNext();

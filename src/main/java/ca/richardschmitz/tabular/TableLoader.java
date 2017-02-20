@@ -18,17 +18,21 @@ public class TableLoader {
     PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO " + tableDefinition.getFullyQualifiedName() + "(" + getColumnNames() +") VALUES (" + getParameterPlaceholders() + ")");
     row.forEach((index, value) -> {
       int sqlIndex = index + 1;
+      int colType = tableDefinition.getColumns().get(index).getType();
       try {
-        int colType = tableDefinition.getColumns().get(index).getType();
-        switch (colType) {
-          case Types.VARCHAR:
-            preparedStatement.setString(sqlIndex, value);
-            break;
-          case Types.INTEGER:
-            preparedStatement.setInt(sqlIndex, Integer.parseInt(value));
-            break;
-          default:
-            throw new RuntimeException("Unhandled column type: " + colType);
+        if ("".equals(value)) {
+          preparedStatement.setNull(sqlIndex, colType);
+        } else {
+          switch (colType) {
+            case Types.VARCHAR:
+              preparedStatement.setString(sqlIndex, value);
+              break;
+            case Types.INTEGER:
+              preparedStatement.setInt(sqlIndex, Integer.parseInt(value));
+              break;
+            default:
+              throw new RuntimeException("Unhandled column type: " + colType);
+          }
         }
       } catch (SQLException ex) {
         throw new RuntimeException(ex);

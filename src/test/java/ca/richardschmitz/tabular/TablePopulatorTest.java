@@ -13,6 +13,11 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TablePopulatorTest {
+  private static final String COL_FIRST_NAME = "first_name";
+  private static final String COL_LAST_NAME = "last_name";
+  private static final String COL_AGE = "age";
+  private static final String COL_OCCUPATION = "occupation";
+
   @Test
   public void testPopulateTable() throws Exception {
     InputStream inputStream = getClass().getResourceAsStream("people.md");
@@ -27,21 +32,28 @@ public class TablePopulatorTest {
       tablePopulator.populateTable("myschema", "people", inputStream);
 
       List<Map<String, Object>> rows = handle.createQuery("select * from myschema.people order by last_name").list();
-      assertThat(rows).size().isEqualTo(2);
+      assertThat(rows).size().isEqualTo(3);
 
       Map<String, Object> firstRow = rows.get(0);
       assertThat(firstRow)
-        .containsEntry("first_name", "Rodney")
-        .containsEntry("last_name", "Barbosa")
-        .containsEntry("age", 33)
-        .containsEntry("occupation", "Engineer");
+        .containsEntry(COL_FIRST_NAME, "Rodney")
+        .containsEntry(COL_LAST_NAME, "Barbosa")
+        .containsEntry(COL_AGE, 33)
+        .containsEntry(COL_OCCUPATION, "Engineer");
 
       Map<String, Object> secondRow = rows.get(1);
       assertThat(secondRow)
-        .containsEntry("first_name", "Celia")
-        .containsEntry("last_name", "Cabbage")
-        .containsEntry("age", 29)
-        .containsEntry("occupation", "Journalist");
+        .containsEntry(COL_FIRST_NAME, "Celia")
+        .containsEntry(COL_LAST_NAME, "Cabbage")
+        .containsEntry(COL_AGE, 29)
+        .containsEntry(COL_OCCUPATION, "Journalist");
+
+      Map<String, Object> thirdRow = rows.get(2);
+      assertThat(thirdRow)
+        .containsEntry(COL_FIRST_NAME, "Henry")
+        .containsEntry(COL_LAST_NAME, "Dozer")
+        .containsEntry(COL_AGE, 17)
+        .containsEntry(COL_OCCUPATION, null);
     }
   }
 }
