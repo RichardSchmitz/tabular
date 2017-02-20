@@ -17,7 +17,10 @@ public class TypeMapperRegistry {
       .register(new DoubleMapper())
       .register(new BigDecimalMapper())
       .register(new StringMapper())
-      .register(new BinaryMapper());
+      .register(new BinaryMapper())
+      .register(new DateMapper())
+      .register(new TimeMapper())
+      .register(new TimestampMapper());
   }
 
   private Map<Integer, List<TypeMapper>> registeredMappers = new HashMap<>();

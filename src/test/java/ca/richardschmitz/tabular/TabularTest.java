@@ -9,6 +9,12 @@ import org.skife.jdbi.v2.Handle;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +37,10 @@ public class TabularTest {
   private static final String COL_INCHES = "inches";
 
   private static final String COL_BINARY = "binary_data";
+
+  private static final String COL_DATE = "local_date";
+  private static final String COL_TIME = "local_time";
+  private static final String COL_TIMESTAMP = "timestamp";
 
   private JdbcConnectionPool dataSource;
   private DBI dbi;
@@ -167,6 +177,30 @@ public class TabularTest {
       Map<String, Object> thirdRow = rows.get(2);
       assertThat(thirdRow)
         .containsEntry(COL_BINARY, new byte[] {(byte) 0xCA, (byte) 0xFE, (byte) 0xBA, (byte) 0xBE});
+    }
+  }
+
+  @Test
+  public void testTimeTable() throws Exception {
+    InputStream inputStream = getInput("times.md");
+
+    try (Handle handle = dbi.open()) {
+      handle.execute("CREATE TABLE myschema.times (" +
+        "  local_date DATE," +
+        "  local_time TIME," +
+        "  timestamp TIMESTAMP" +
+        ")");
+
+      tabular.populateTable("myschema", "times", inputStream);
+
+      List<Map<String, Object>> rows = handle.createQuery("select * from myschema.times order by timestamp").list();
+      assertThat(rows).size().isEqualTo(1);
+
+      Map<String, Object> firstRow = rows.get(0);
+      assertThat(firstRow)
+        .containsEntry(COL_DATE, Date.valueOf(LocalDate.parse("2017-02-20")))
+        .containsEntry(COL_TIME, Time.valueOf(LocalTime.parse("15:31:20")))
+        .containsEntry(COL_TIMESTAMP, Timestamp.from(ZonedDateTime.parse("2017-02-20T15:31:20-08:00").toInstant()));
     }
   }
 

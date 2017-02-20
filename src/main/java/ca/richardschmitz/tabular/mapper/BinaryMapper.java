@@ -10,7 +10,6 @@ import java.sql.Types;
 public class BinaryMapper implements TypeMapper {
   @Override
   public boolean setValue(PreparedStatement statement, int sqlIndex, String rawValue) throws SQLException {
-
     try {
       String strToDecode = rawValue;
       if (rawValue.substring(0, 2).equalsIgnoreCase("0x")) {
