@@ -27,8 +27,16 @@ public class TableLoader {
             case Types.VARCHAR:
               preparedStatement.setString(sqlIndex, value);
               break;
+            case Types.TINYINT:
+              preparedStatement.setByte(sqlIndex, Byte.parseByte(value));
+              break;
+            case Types.SMALLINT:
+              preparedStatement.setShort(sqlIndex, Short.parseShort(value));
+              break;
             case Types.INTEGER:
               preparedStatement.setInt(sqlIndex, Integer.parseInt(value));
+            case Types.BIGINT:
+              preparedStatement.setLong(sqlIndex, Long.parseLong(value));
               break;
             case Types.BOOLEAN:
               boolean parsedValue;
