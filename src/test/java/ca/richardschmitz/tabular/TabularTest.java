@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TablePopulatorTest {
+public class TabularTest {
   private static final String COL_FIRST_NAME = "first_name";
   private static final String COL_LAST_NAME = "last_name";
   private static final String COL_AGE = "age";
@@ -34,7 +34,7 @@ public class TablePopulatorTest {
 
   private JdbcConnectionPool dataSource;
   private DBI dbi;
-  private TablePopulator tablePopulator;
+  private Tabular tabular;
 
   @Before
   public void setUp() {
@@ -43,7 +43,7 @@ public class TablePopulatorTest {
     try (Handle handle = dbi.open()) {
       handle.execute("CREATE SCHEMA myschema");
     }
-    tablePopulator = new TablePopulator(dataSource);
+    tabular = new Tabular(dataSource);
   }
 
   @After
@@ -63,7 +63,7 @@ public class TablePopulatorTest {
         "  has_degree BOOLEAN" +
         ")");
 
-      tablePopulator.populateTable("myschema", "people", inputStream);
+      tabular.populateTable("myschema", "people", inputStream);
 
       List<Map<String, Object>> rows = handle.createQuery("select * from myschema.people order by last_name").list();
       assertThat(rows).size().isEqualTo(3);
@@ -105,7 +105,7 @@ public class TablePopulatorTest {
         "  MILLISECONDS BIGINT" +
         ")");
 
-      tablePopulator.populateTable("myschema", "durations", inputStream);
+      tabular.populateTable("myschema", "durations", inputStream);
 
       List<Map<String, Object>> rows = handle.createQuery("select * from myschema.durations order by milliseconds").list();
       assertThat(rows).size().isEqualTo(1);
@@ -129,7 +129,7 @@ public class TablePopulatorTest {
         "  inches NUMERIC" +
         ")");
 
-      tablePopulator.populateTable("myschema", "distances", inputStream);
+      tabular.populateTable("myschema", "distances", inputStream);
 
       List<Map<String, Object>> rows = handle.createQuery("select * from myschema.distances order by meters").list();
       assertThat(rows).size().isEqualTo(1);
@@ -151,7 +151,7 @@ public class TablePopulatorTest {
         "  binary_data VARBINARY" +
         ")");
 
-      tablePopulator.populateTable("myschema", "binary", inputStream);
+      tabular.populateTable("myschema", "binary", inputStream);
 
       List<Map<String, Object>> rows = handle.createQuery("select * from myschema.binary order by binary_data").list();
       assertThat(rows).size().isEqualTo(3);

@@ -17,11 +17,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TablePopulator {
+public class Tabular {
   private final DataSource dataSource;
   private final Parser parser;
 
-  public TablePopulator(DataSource dataSource) {
+  public Tabular(DataSource dataSource) {
     this.dataSource = dataSource;
     this.parser = Parser.builder().extensions(Arrays.asList(TablesExtension.create())).build();
   }
