@@ -1,5 +1,6 @@
 package ca.richardschmitz.tabular.mapper;
 
+import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
@@ -15,7 +16,8 @@ public class TypeMapperRegistry {
       .register(new FloatMapper())
       .register(new DoubleMapper())
       .register(new BigDecimalMapper())
-      .register(new StringMapper());
+      .register(new StringMapper())
+      .register(new BinaryMapper());
   }
 
   private Map<Integer, List<TypeMapper>> registeredMappers = new HashMap<>();
@@ -23,7 +25,7 @@ public class TypeMapperRegistry {
   public void setValue(PreparedStatement statement, int sqlIndex, String rawValue, int type) throws SQLException {
     List<TypeMapper> mappers = registeredMappers.get(type);
     if (mappers == null || mappers.isEmpty()) {
-      throw new RuntimeException("Unhandled column type: " + type);
+      abort(type, rawValue);
     }
 
     for (TypeMapper mapper : mappers) {
@@ -34,7 +36,7 @@ public class TypeMapperRegistry {
       }
     }
 
-    throw new RuntimeException("Unhandled column type: " + type);
+    abort(type, rawValue);
   }
 
   public TypeMapperRegistry register(TypeMapper mapper) {
@@ -51,5 +53,9 @@ public class TypeMapperRegistry {
     }
 
     return this;
+  }
+
+  private void abort(int type, String rawValue) {
+    throw new RuntimeException(String.format("No TypeMappers could handle converting '%s' to %s", rawValue, JDBCType.valueOf(type)));
   }
 }

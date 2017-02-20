@@ -30,6 +30,8 @@ public class TablePopulatorTest {
   private static final String COL_CMS = "cms";
   private static final String COL_INCHES = "inches";
 
+  private static final String COL_BINARY = "binary_data";
+
   private JdbcConnectionPool dataSource;
   private DBI dbi;
   private TablePopulator tablePopulator;
@@ -137,6 +139,34 @@ public class TablePopulatorTest {
         .containsEntry(COL_METERS, (float) 1.5437)
         .containsEntry(COL_CMS, 154.37d)
         .containsEntry(COL_INCHES, new BigDecimal("60.7755906"));
+    }
+  }
+
+  @Test
+  public void testBinaryTable() throws Exception {
+    InputStream inputStream = getInput("binary.md");
+
+    try (Handle handle = dbi.open()) {
+      handle.execute("CREATE TABLE myschema.binary (" +
+        "  binary_data VARBINARY" +
+        ")");
+
+      tablePopulator.populateTable("myschema", "binary", inputStream);
+
+      List<Map<String, Object>> rows = handle.createQuery("select * from myschema.binary order by binary_data").list();
+      assertThat(rows).size().isEqualTo(3);
+
+      Map<String, Object> firstRow = rows.get(0);
+      assertThat(firstRow)
+        .containsEntry(COL_BINARY, new byte[] {0x00, 0x01, 0x02, 0x03});
+
+      Map<String, Object> secondRow = rows.get(1);
+      assertThat(secondRow)
+        .containsEntry(COL_BINARY, new byte[] {0x00, (byte) 0xFF, 0x00});
+
+      Map<String, Object> thirdRow = rows.get(2);
+      assertThat(thirdRow)
+        .containsEntry(COL_BINARY, new byte[] {(byte) 0xCA, (byte) 0xFE, (byte) 0xBA, (byte) 0xBE});
     }
   }
 
