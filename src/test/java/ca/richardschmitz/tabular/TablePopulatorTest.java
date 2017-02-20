@@ -8,6 +8,7 @@ import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,10 @@ public class TablePopulatorTest {
   private static final String COL_MINUTES = "minutes";
   private static final String COL_SECONDS = "seconds";
   private static final String COL_MILLIS = "milliseconds";
+
+  private static final String COL_METERS = "meters";
+  private static final String COL_CMS = "cms";
+  private static final String COL_INCHES = "inches";
 
   private JdbcConnectionPool dataSource;
   private DBI dbi;
@@ -109,6 +114,29 @@ public class TablePopulatorTest {
         .containsEntry(COL_MINUTES, (short) 60)
         .containsEntry(COL_SECONDS, 3600)
         .containsEntry(COL_MILLIS, 3600000L);
+    }
+  }
+
+  @Test
+  public void testDecimalTable() throws Exception {
+    InputStream inputStream = getInput("distances.md");
+    try (Handle handle = dbi.open()) {
+      handle.execute("CREATE TABLE myschema.distances (" +
+        "  meters REAL," +
+        "  cms DOUBLE," +
+        "  inches NUMERIC" +
+        ")");
+
+      tablePopulator.populateTable("myschema", "distances", inputStream);
+
+      List<Map<String, Object>> rows = handle.createQuery("select * from myschema.distances order by meters").list();
+      assertThat(rows).size().isEqualTo(1);
+
+      Map<String, Object> firstRow = rows.get(0);
+      assertThat(firstRow)
+        .containsEntry(COL_METERS, (float) 1.5437)
+        .containsEntry(COL_CMS, 154.37d)
+        .containsEntry(COL_INCHES, new BigDecimal("60.7755906"));
     }
   }
 

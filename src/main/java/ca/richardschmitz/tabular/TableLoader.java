@@ -1,5 +1,6 @@
 package ca.richardschmitz.tabular;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -35,8 +36,19 @@ public class TableLoader {
               break;
             case Types.INTEGER:
               preparedStatement.setInt(sqlIndex, Integer.parseInt(value));
+              break;
             case Types.BIGINT:
               preparedStatement.setLong(sqlIndex, Long.parseLong(value));
+              break;
+            case Types.REAL:
+              preparedStatement.setFloat(sqlIndex, Float.parseFloat(value));
+              break;
+            case Types.DOUBLE:
+              preparedStatement.setDouble(sqlIndex, Double.parseDouble(value));
+              break;
+            case Types.NUMERIC:
+            case Types.DECIMAL:
+              preparedStatement.setBigDecimal(sqlIndex, new BigDecimal(value));
               break;
             case Types.BOOLEAN:
               boolean parsedValue;
