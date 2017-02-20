@@ -30,6 +30,17 @@ public class TableLoader {
             case Types.INTEGER:
               preparedStatement.setInt(sqlIndex, Integer.parseInt(value));
               break;
+            case Types.BOOLEAN:
+              boolean parsedValue;
+              if ("Y".equals(value) || "T".equals(value)) {
+                parsedValue = true;
+              } else if ("N".equals(value) || "F".equals(value)) {
+                parsedValue = false;
+              } else {
+                parsedValue = Boolean.parseBoolean(value);
+              }
+              preparedStatement.setBoolean(sqlIndex, parsedValue);
+              break;
             default:
               throw new RuntimeException("Unhandled column type: " + colType);
           }

@@ -17,6 +17,7 @@ public class TablePopulatorTest {
   private static final String COL_LAST_NAME = "last_name";
   private static final String COL_AGE = "age";
   private static final String COL_OCCUPATION = "occupation";
+  private static final String COL_DEGREE = "has_degree";
 
   @Test
   public void testPopulateTable() throws Exception {
@@ -28,7 +29,13 @@ public class TablePopulatorTest {
 
     try (Handle handle = dbi.open()) {
       handle.execute("CREATE SCHEMA myschema");
-      handle.execute("CREATE TABLE myschema.people (first_name VARCHAR, last_name VARCHAR, age INT, occupation VARCHAR)");
+      handle.execute("CREATE TABLE myschema.people (" +
+        "  first_name VARCHAR," +
+        "  last_name VARCHAR," +
+        "  age INT," +
+        "  occupation VARCHAR," +
+        "  has_degree BOOLEAN" +
+        ")");
       tablePopulator.populateTable("myschema", "people", inputStream);
 
       List<Map<String, Object>> rows = handle.createQuery("select * from myschema.people order by last_name").list();
@@ -39,21 +46,24 @@ public class TablePopulatorTest {
         .containsEntry(COL_FIRST_NAME, "Rodney")
         .containsEntry(COL_LAST_NAME, "Barbosa")
         .containsEntry(COL_AGE, 33)
-        .containsEntry(COL_OCCUPATION, "Engineer");
+        .containsEntry(COL_OCCUPATION, "Engineer")
+        .containsEntry(COL_DEGREE, true);
 
       Map<String, Object> secondRow = rows.get(1);
       assertThat(secondRow)
         .containsEntry(COL_FIRST_NAME, "Celia")
         .containsEntry(COL_LAST_NAME, "Cabbage")
         .containsEntry(COL_AGE, 29)
-        .containsEntry(COL_OCCUPATION, "Journalist");
+        .containsEntry(COL_OCCUPATION, "Journalist")
+        .containsEntry(COL_DEGREE, true);
 
       Map<String, Object> thirdRow = rows.get(2);
       assertThat(thirdRow)
         .containsEntry(COL_FIRST_NAME, "Henry")
         .containsEntry(COL_LAST_NAME, "Dozer")
         .containsEntry(COL_AGE, 17)
-        .containsEntry(COL_OCCUPATION, null);
+        .containsEntry(COL_OCCUPATION, null)
+        .containsEntry(COL_DEGREE, false);
     }
   }
 }

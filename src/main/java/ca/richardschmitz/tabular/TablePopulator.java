@@ -73,7 +73,11 @@ public class TablePopulator {
 
     while (columnHeader != null) {
       String columnName = ((Text) columnHeader.getFirstChild()).getLiteral().toUpperCase();
-      tableDefinition.addColumn(numColumns++, columnName, columnType.get(columnName));
+      Integer colType = columnType.get(columnName);
+      if (colType == null) {
+        throw new RuntimeException(String.format("Column '%s' was found in the document but not in the database.", columnName));
+      }
+      tableDefinition.addColumn(numColumns++, columnName, colType);
 
       columnHeader = columnHeader.getNext();
     }
