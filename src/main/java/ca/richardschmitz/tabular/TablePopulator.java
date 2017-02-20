@@ -32,28 +32,10 @@ public class TablePopulator {
 
   public void populateTable(String schema, String tableName, String markdown) throws SQLException {
     Node document = parser.parse(markdown);
+    Node tableHead = document.getFirstChild().getFirstChild();
 
     try(Connection con = dataSource.getConnection()) {
-      DatabaseMetaData metaData = con.getMetaData();
-      TableDefinition tableDefinition = new TableDefinition(schema, tableName);
-      ResultSet rs = metaData.getColumns(null, schema.toUpperCase(), tableName.toUpperCase(), null);
-      int numColumns = 0;
-      Map<String, Integer> columnType = new HashMap<>();
-      while (rs.next()) {
-        columnType.put(rs.getString("COLUMN_NAME").toUpperCase(), rs.getInt("DATA_TYPE"));
-      }
-
-      Node tableHead = document.getFirstChild().getFirstChild();
-
-      Node columnHeader = tableHead.getFirstChild().getFirstChild();
-      String columnName = ((Text) columnHeader.getFirstChild()).getLiteral().toUpperCase();
-      tableDefinition.addColumn(numColumns++, columnName, columnType.get(columnName));
-
-      while (columnHeader.getNext() != null) {
-        columnHeader = columnHeader.getNext();
-        columnName = ((Text) columnHeader.getFirstChild()).getLiteral().toUpperCase();
-        tableDefinition.addColumn(numColumns++, columnName, columnType.get(columnName));
-      }
+      TableDefinition tableDefinition = createTableDefinition(con, schema, tableName, tableHead);
 
       TableLoader tableLoader = new TableLoader(tableDefinition);
       Node tableBody = tableHead.getNext();
@@ -61,8 +43,7 @@ public class TablePopulator {
       Node row = tableBody.getFirstChild();
       while (row != null) {
         Map<Integer, String> columnValues = new HashMap<>();
-        for (int i = 0; i < numColumns; i++) {
-          TableDefinition.ColumnDefinition columnDefinition = tableDefinition.getColumns().get(i);
+        for (int i = 0; i < tableDefinition.getColumns().size(); i++) {
           Node cell = getNthChild(row, i);
           columnValues.put(i, ((Text) cell.getFirstChild()).getLiteral());
         }
@@ -71,6 +52,28 @@ public class TablePopulator {
       }
 
     }
+  }
+
+  private TableDefinition createTableDefinition(Connection con, String schema, String tableName, Node tableHead) throws SQLException {
+    TableDefinition tableDefinition = new TableDefinition(schema, tableName);
+    DatabaseMetaData metaData = con.getMetaData();
+    ResultSet rs = metaData.getColumns(null, schema.toUpperCase(), tableName.toUpperCase(), null);
+    int numColumns = 0;
+    Map<String, Integer> columnType = new HashMap<>();
+    while (rs.next()) {
+      columnType.put(rs.getString("COLUMN_NAME").toUpperCase(), rs.getInt("DATA_TYPE"));
+    }
+
+    Node columnHeader = tableHead.getFirstChild().getFirstChild();
+
+    while (columnHeader != null) {
+      String columnName = ((Text) columnHeader.getFirstChild()).getLiteral().toUpperCase();
+      tableDefinition.addColumn(numColumns++, columnName, columnType.get(columnName));
+
+      columnHeader = columnHeader.getNext();
+    }
+
+    return tableDefinition;
   }
 
   private Node getNthChild(Node node, int n) {
