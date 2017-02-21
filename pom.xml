@@ -4,7 +4,7 @@
 
   <groupId>ca.richardschmitz</groupId>
   <artifactId>tabular</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <packaging>jar</packaging>
 
   <name>tabular</name>
