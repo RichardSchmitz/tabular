@@ -62,7 +62,7 @@ public class Tabular {
   private TableDefinition createTableDefinition(Connection con, String schema, String tableName, Node tableHead) throws SQLException {
     TableDefinition tableDefinition = new TableDefinition(schema, tableName);
     DatabaseMetaData metaData = con.getMetaData();
-    ResultSet rs = metaData.getColumns(null, schema.toUpperCase(), tableName.toUpperCase(), null);
+    ResultSet rs = metaData.getColumns(null, schema == null ? "" : schema.toUpperCase(), tableName.toUpperCase(), null);
     int numColumns = 0;
     Map<String, Integer> columnType = new HashMap<>();
     while (rs.next()) {

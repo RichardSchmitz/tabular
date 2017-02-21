@@ -1,5 +1,7 @@
 package ca.richardschmitz.tabular;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class TableDefinition {
   }
 
   public String getFullyQualifiedName() {
-    if (schema == null) {
+    if (StringUtils.isEmpty(schema)) {
       return getName();
     } else {
       return getSchema() + "." + getName();

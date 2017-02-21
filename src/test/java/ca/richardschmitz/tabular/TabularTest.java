@@ -105,6 +105,25 @@ public class TabularTest {
   }
 
   @Test
+  public void testBasicSchemalessTable() throws Exception {
+    InputStream inputStream = getInput("people.md");
+    try (Handle handle = dbi.open()) {
+      handle.execute("CREATE TABLE people (" +
+        "  first_name VARCHAR," +
+        "  last_name VARCHAR," +
+        "  age INT," +
+        "  occupation VARCHAR," +
+        "  has_degree BOOLEAN" +
+        ")");
+
+      tabular.populateTable(null, "people", inputStream);
+
+      List<Map<String, Object>> rows = handle.createQuery("select * from people order by last_name").list();
+      assertThat(rows).size().isEqualTo(3);
+    }
+  }
+
+  @Test
   public void testNumericTable() throws Exception {
     InputStream inputStream = getInput("durations.md");
     try (Handle handle = dbi.open()) {
